@@ -187,3 +187,52 @@ from receipt
          join detailreceipt d on receipt.id = d.idd_receipt
 group by code_receipt, idd_supplies, amount, price;
 
+#
+Hiển thị bảng số phiếu nhập hàng, mã vật tư, tên vật tư,số lượng nhập, đơn giá nhập, thành tiền
+use Managersupplies;
+select code_receipt, idd_supplies, name_supplies, amount, price, (amount * price) as Amountmoney
+from receipt
+         join detailreceipt d on receipt.id = d.idd_receipt
+         join supplies s on s.id = d.idd_supplies;
+
+#
+số phiếu nhập hàng, ngày nhập hàng, số đơn đặt hàng, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+select code_receipt,date_receipt,id_oder,idd_supplies,name_supplies,amount,price,(amount*price) as Thanhtien from receipt
+join detailreceipt d on receipt.id = d.idd_receipt
+join supplies s on s.id = d.idd_supplies;
+
+#
+số phiếu nhập hàng, ngày nhập hàng, số đơn đặt hàng, mã nhà cung cấp, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+select code_receipt,date_receipt,id_oder,code_supplier,code_supplies,name_supplies,amount,price,(price*amount) from receipt
+join detailreceipt d on receipt.id = d.idd_receipt
+join supplies s on s.id = d.idd_supplies
+join oder o on o.id = receipt.id_oder
+join supplier s2 on s2.id = o.id_supplier;
+
+#
+số phiếu nhập hàng, mã vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập. Và chỉ liệt kê các chi tiết nhập có số lượng nhập > 5.
+select code_receipt, code_supplies, amount, price, (price * amount)
+from receipt
+         join detailreceipt d on receipt.id = d.idd_receipt
+         join supplies s on s.id = d.idd_supplies
+where amount > 5;
+
+#
+số phiếu nhập hàng, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập. Và chỉ liệt kê các chi tiết nhập vật tư có đơn vị tính là Bộ.
+select code_receipt,code_supplies,name_supplies,amount,price,(price*amount) from detailreceipt
+join receipt r on r.id = detailreceipt.idd_receipt
+join supplies s on s.id = detailreceipt.idd_supplies
+where chargingunit = 'sanpham';
+
+#số
+phiếu xuất hàng, mã vật tư, số lượng xuất, đơn giá xuất, thành tiền xuất.
+select code_deliverybill,code_supplies,amount,price,(price*amount) from deliverybill
+join detaildeliverybill d on deliverybill.id = d.id_deliverybill
+join supplies s on s.id = d.id_supplies;
+
+#
+số phiếu xuất hàng, tên khách hàng, mã vật tư, tên vật tư, số lượng xuất, đơn giá xuất.
+select code_deliverybill,customer_name,code_supplies,name_supplies,amount,price from deliverybill
+join detaildeliverybill d on deliverybill.id = d.id_deliverybill
+join supplies s on s.id = d.id_supplies
+
