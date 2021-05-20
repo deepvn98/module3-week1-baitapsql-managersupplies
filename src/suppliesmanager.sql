@@ -362,9 +362,84 @@ from deliverybill
          join detaildeliverybill d on deliverybill.id = d.id_deliverybill
          join supplies s on s.id = d.id_supplies
     );
-select * from vw_CTPXUAT_VT_PX;
+select *
+from vw_CTPXUAT_VT_PX;
 
 
 # bai tap procedure
+
+# Câu 1. Tạo Stored procedure (SP)
+# cho biết tổng số lượng cuối của vật tư với mã vật tư là tham số vào.
+
+create view SL_SP_InStore as
+(
+select code_supplies,
+       name_supplies,
+       sum(first_quantity) as Sltonkho,
+       sum(add_quantity)   as Slnhap,
+       sum(expot_quantity) as Slxuat
+from supplies
+         join store s on supplies.id = s.id_supplies
+group by code_supplies, name_supplies
+    );
+select *
+from sl_sp_instore;
+# tạo procedure có tham số là code_supplies
+create procedure get_SLSP_In_store(in code_supplies1 varchar(100))
+begin
+select code_supplies, name_supplies, (Sltonkho + Slnhap - Slxuat) as Sl_Sp_TrongKho
+from SL_SP_InStore
+group by code_supplies, name_supplies
+having code_supplies = code_supplies1;
+end;
+call get_SLSP_In_store('DL1');
+
+
+
+# Câu 2. Tạo SP cho biết tổng tiền xuất của vật tư với mã vật tư là tham số vào.
+create procedure get_tongtien(in code_supplies1 varchar(100))
+begin
+select code_supplies,
+       name_supplies,
+       amount * price as Tong_Tien_Xuat_SP
+from detaildeliverybill
+         join supplies s on s.id = detaildeliverybill.id_supplies
+where code_supplies = code_supplies1;
+end;
+call get_tongtien('DL1');
+
+
+
+# Câu 3. Tạo SP cho biết tổng số lượng đặt theo số đơn hàng với số đơn hàng là tham số vào.
+create procedure get_amount_oder_by_code_oder(in code_oder1 varchar(20))
+begin
+select code_oder, sum(amount) as Tong_SL_Dat
+from detailoder
+         join oder o on o.id = detailoder.id_oder
+group by code_oder
+having code_oder = code_oder1;
+end;
+call get_amount_oder_by_code_oder('cd01');
+
+
+# Câu 4. Tạo SP dùng để thêm một đơn đặt hàng.
+create procedure insert_into_oder(in code_oder1 varchar(20),date1 date,id_supplier1 int)
+begin
+insert into oder(code_oder, date, id_supplier) value
+    (code_oder1,date1,id_supplier1);
+end;
+call insert_into_oder('cd_0001','2021-05-20',3);
+
+
+# Câu 5. Tạo SP dùng để thêm một chi tiết đơn đặt hàng.
+create procedure insert_into_supplies(in code_supplies1 varchar(20),
+ name_supplies1 varchar(50),
+ chargingunit1 varchar(20),
+  price_supplies1 double)
+begin
+insert into supplies(code_supplies, name_supplies, chargingunit, price_supplies) value
+    (code_supplies1,name_supplies1,chargingunit1,price_supplies1);
+end;
+call insert_into_supplies('CP01','Capo','sp',2.500);
 
 
